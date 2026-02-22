@@ -1,5 +1,13 @@
 package com.aluracursos.literalura.consumoapi;
 
-public record DatosRespuesta(int count,
-                             List<Libro> results) {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.util.List;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record DatosRespuesta(
+        int count,
+        List<Libro> results
+) {
 }

@@ -22,7 +22,6 @@ public class ClienteApiLibros {
             //obtengo json
             String json = restTemplate.getForObject(urlCompleta, String.class);
             return apiResponseMapper.parsear(json);
-
         }  catch (Exception e){
             String mensajeError = "Error al obtener datos de la API: " + e.getMessage();
             System.err.println(mensajeError);
