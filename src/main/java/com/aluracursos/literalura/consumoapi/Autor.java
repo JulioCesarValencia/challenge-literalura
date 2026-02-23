@@ -10,8 +10,7 @@ import java.util.List;
 public record Autor(
         @JsonAlias({"name","Name"}) String nombre,
         @JsonAlias({"birth_year","birth_date"}) String fecha_nacimiento,
-        @JsonAlias({"death_year","death_date"}) String fecha_fallecimiento,
-        @JsonAlias("books") List<String> libros
+        @JsonAlias({"death_year","death_date"}) String fecha_fallecimiento
 ){}
 
 

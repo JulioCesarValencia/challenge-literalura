@@ -86,7 +86,30 @@ public class LibrosController implements CommandLineRunner {
     }
 
     private void listarAutores() {
-        System.out.println("3");
+        System.out.println("Ingresa el nombre del libro para ver sus autores:");
+        String titulo = teclado.nextLine();
+
+        String query = URLEncoder.encode(titulo, StandardCharsets.UTF_8);
+        DatosRespuesta datos = clienteApiLibros.obtenerDatos("?search=" + query);
+
+        if (datos.results().isEmpty()) {
+            System.out.println("No se encontraron libros con ese título.");
+            return;
+        }
+
+        Set<String> autoresMostrados = new HashSet<>();
+
+        for (Libro libro : datos.results()) {
+            for (Autor autor : libro.autores()) {
+                if (autoresMostrados.add(autor.nombre())) {
+                    System.out.println("Autor: " + autor.nombre());
+                    System.out.println("Nacimiento: " + autor.fecha_nacimiento());
+                    System.out.println("Fallecimmiento: " + autor.fecha_fallecimiento());
+                    System.out.println("**********************");
+                }
+            }
+        }
+
     }
 
     private void listarAutoresVivosPorAnio() {
