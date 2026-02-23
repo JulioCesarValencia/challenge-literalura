@@ -13,4 +13,16 @@ public record Libro(int id,
                     @JsonAlias("languages") List<String> idiomas,
                     @JsonAlias("download_count") int descargas
 ) {
+
+    @Override
+    public String toString() {
+        return "Libro{" +
+                "titulo='" + titulo + '\'' +
+                ", autores=" + autores +
+                ", idiomas=" + idiomas +
+                ", descargas=" + descargas +
+                '}';
+    }
 }
+
+

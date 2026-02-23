@@ -67,26 +67,17 @@ public class LibrosController implements CommandLineRunner {
             return;
         }
 
-        // Mapea Autor -> Libros
-        Map<String, List<String>> librosPorAutor = new HashMap<>();
 
         for (Libro libro : datos.results()) {
-            if (libro.titulo().toLowerCase().contains(titulo.toLowerCase())) {
-                for (Autor autor : libro.autores()) {
-                    librosPorAutor
-                            //busco la "clave"(key) y si no existe,ejecuta la funcion "k -> .."para crea un "valor inicial"(vacio)
-                            .computeIfAbsent(autor.nombre(), k -> new ArrayList<>())
-                            .add(libro.titulo());
-                }
-            }
+            System.out.println("Título: " + libro.titulo());
+            System.out.println("Autor(es): " +
+                    libro.autores().stream()
+                            .map(Autor::nombre)
+                            .toList());
+            System.out.println("Idiomas: " + libro.idiomas());
+            System.out.println("Descargas: " + libro.descargas());
+            System.out.println("********************");
         }
-
-        // muestro los resultados
-        librosPorAutor.forEach((autor, libros) -> {
-            System.out.println("\nAutor: " + autor);
-            System.out.println("Libros:");
-            libros.forEach(libro -> System.out.println(" - " + libro));
-        });
 
     }
 
