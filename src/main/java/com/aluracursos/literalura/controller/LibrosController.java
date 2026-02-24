@@ -46,8 +46,9 @@ public class LibrosController implements CommandLineRunner {
                     1 - Buscar libro por titulo
                     2 - Listar libros registrados
                     3 - Listar autores registrados
-                    4 - Listar autores vivos en un anio
+                    4 - Listar autores vivos en determinado anio
                     5 - Listar libros por idioma
+                    6 - Top 10 mas descargados
                     0 - Salir
                     ********************
                     """);
@@ -61,6 +62,7 @@ public class LibrosController implements CommandLineRunner {
                 case 3 -> listarAutores();
                 case 4 -> listarAutoresVivosPorAnio();
                 case 5 -> listarLibrosPorIdioma();
+                case 6 -> top10MasDescargados();
                 case 0 -> System.out.println("Gracias por tu visita!");
                 default -> System.out.println("Opcion invalida");
             }
@@ -88,69 +90,57 @@ public class LibrosController implements CommandLineRunner {
 
             for (Autor autorApi : libroApi.autores()) {
                 AutorEntity autorEntity = autorRepository.findByNombre(autorApi.nombre())
-                .orElseGet(() -> {
-                    AutorEntity a = new AutorEntity();
-                    a.setNombre(autorApi.nombre());
-                    a.setFechaNacimiento(autorApi.fecha_nacimiento() != null
-                            ? Integer.valueOf(autorApi.fecha_nacimiento()) : null);
-                    a.setFechaFallecimiento(autorApi.fecha_fallecimiento() != null
-                            ? Integer.valueOf(autorApi.fecha_fallecimiento()) : null);
-                    return autorRepository.save(a); // save nuevo autor
-                });
+                        .orElseGet(() -> {
+                            AutorEntity a = new AutorEntity();
+                            a.setNombre(autorApi.nombre());
+                            a.setFechaNacimiento(autorApi.fecha_nacimiento() != null
+                                    ? Integer.valueOf(autorApi.fecha_nacimiento()) : null);
+                            a.setFechaFallecimiento(autorApi.fecha_fallecimiento() != null
+                                    ? Integer.valueOf(autorApi.fecha_fallecimiento()) : null);
+                            return autorRepository.save(a); // save nuevo autor
+                        });
                 autoresEntity.add(autorEntity);
-                }
-
-
-                //verifico dupliado
-                Optional<LibroEntity> libroExistenteOpt = libroRepository.findByTitulo(libroApi.titulo());
-                if (libroExistenteOpt.isPresent()) {
-                    // si existe, podríamos actualizar descargas/idiomas y relaciones si hace falta
-                    LibroEntity existente = libroExistenteOpt.get();
-                    existente.setDescargas(libroApi.descargas());
-                    // actualizar idiomas (simplificamos guardando el primero como cadena)
-                    existente.setIdioma(String.join(",", libroApi.idiomas()));
-                    // asegurar relaciones autor-libro
-                    List<AutorEntity> actuales = existente.getAutores() == null ? new ArrayList<>() : existente.getAutores();
-                    for (AutorEntity a : autoresEntity) {
-                        if (actuales.stream().noneMatch(x -> x.getId().equals(a.getId()))) {
-                            actuales.add(a);
-                        }
-                    }
-                    existente.setAutores(actuales);
-                    libroRepository.save(existente);
-                } else {
-                    // crear nuevo libroEntity
-                    LibroEntity nuevo = new LibroEntity();
-                    nuevo.setTitulo(libroApi.titulo());
-                    nuevo.setDescargas(libroApi.descargas());
-                    nuevo.setIdioma(String.join(",", libroApi.idiomas())); // guardamos los idiomas como CSV
-                    nuevo.setAutores(autoresEntity);
-                    libroRepository.save(nuevo);
-                }
-//            System.out.println("Título: " + libro.titulo());
-//            System.out.println("Autor(es): " +
-//                    libro.autores().stream()
-//                            .map(Autor::nombre)
-//                            .toList());
-//            System.out.println("Idiomas: " + libro.idiomas());
-//            System.out.println("Descargas: " + libro.descargas());
-//            System.out.println("********************");
             }
 
+
+            //verifico dupliado
+            Optional<LibroEntity> libroExistenteOpt = libroRepository.findByTitulo(libroApi.titulo());
+            if (libroExistenteOpt.isPresent()) {
+                LibroEntity existente = libroExistenteOpt.get();
+                existente.setDescargas(libroApi.descargas());
+                existente.setIdioma(String.join(",", libroApi.idiomas()));
+                List<AutorEntity> actuales = existente.getAutores() == null ? new ArrayList<>() : existente.getAutores();
+                for (AutorEntity a : autoresEntity) {
+                    if (actuales.stream().noneMatch(x -> x.getId().equals(a.getId()))) {
+                        actuales.add(a);
+                    }
+                }
+                existente.setAutores(actuales);
+                libroRepository.save(existente);
+            } else {
+                // crear nuevo libroEntity
+                LibroEntity nuevo = new LibroEntity();
+                nuevo.setTitulo(libroApi.titulo());
+                nuevo.setDescargas(libroApi.descargas());
+                nuevo.setIdioma(String.join(",", libroApi.idiomas())); // guardamos los idiomas como CSV
+                nuevo.setAutores(autoresEntity);
+                libroRepository.save(nuevo);
+            }
+
+        }
+
         System.out.println("Guardado(s) en la base de datos (si no existían). Mostrando resultados:");
-        //datos.results().forEach(libro -> System.out.println(libro)); // usa toString() del record Libro
 
         int count = 0;
         for (Libro libro : datos.results()) {
-            if(count >= 4) break; // solo los primeros 4 libros
+            if (count >= 4) break; // solo los primeros 4 libros
 
-            // Primer autor
             Autor autor = libro.autores().isEmpty() ? null : libro.autores().get(0);
             String nombreAutor = autor == null ? "Desconocido" : autor.nombre();
 
-            // Primer idioma
             String idioma = libro.idiomas().isEmpty() ? "-" : libro.idiomas().get(0);
 
+            System.out.println("------LIBRO------");
             System.out.println("Título: " + libro.titulo());
             System.out.println("Autor: " + nombreAutor);
             System.out.println("Idioma: " + idioma);
@@ -170,6 +160,7 @@ public class LibrosController implements CommandLineRunner {
         }
 
         for (LibroEntity le : libros) {
+            System.out.println("------LIBRO------");
             System.out.println("Título: " + le.getTitulo());
             System.out.println("Autores: " + (le.getAutores() == null ? List.of() :
                     le.getAutores().stream().map(AutorEntity::getNombre).toList()));
@@ -199,9 +190,8 @@ public class LibrosController implements CommandLineRunner {
     }
 
 
-
     private void listarAutoresVivosPorAnio() {
-        System.out.println("Ingrese el año para filtrar autores vivos en ese año:");
+        System.out.println("Ingrese el año vivo de autor(es) que desea buscar:");
         int anio = Integer.parseInt(teclado.nextLine());
 
         List<AutorEntity> autores = autorRepository.findAll();
@@ -221,6 +211,7 @@ public class LibrosController implements CommandLineRunner {
             return;
         }
         System.out.println("Autores vivos en " + anio + ":");
+        System.out.println("----------------------");
         //vivos.forEach(a -> System.out.println(a.getNombre() + " (" + a.getFechaNacimiento() + " - " + a.getFechaFallecimiento() + ")"));
 
 
@@ -237,12 +228,12 @@ public class LibrosController implements CommandLineRunner {
     }
 
     private void listarLibrosPorIdioma() {
-        System.out.println("Ingresa el idioma: ");
+        System.out.println("Ingresa el idioma para buscar los libros:");
         System.out.println("es - Español");
         System.out.println("en - Inglés");
         System.out.println("fr - Francés");
         System.out.println("pt - Portugués");
-
+        System.out.println("-------------------");
         String idioma = teclado.nextLine().toLowerCase();
 
         List<LibroEntity> libros = libroRepository.buscarLibrosPorIdioma(idioma);
@@ -254,6 +245,7 @@ public class LibrosController implements CommandLineRunner {
         System.out.println("Libros en idioma '" + idioma + "':");
 
         for (LibroEntity le : libros) {
+            System.out.println("------LIBRO------");
             System.out.println("Título: " + le.getTitulo());
             System.out.println("Autor(es): " + (le.getAutores() == null ? List.of() :
                     le.getAutores().stream().map(AutorEntity::getNombre).toList()));
@@ -262,16 +254,25 @@ public class LibrosController implements CommandLineRunner {
             System.out.println("----------------------");
         }
 
+    }
 
-//
-//        long total = libroRepository.contarLibrosPorIdioma(idioma);
-//
-//        System.out.println("Total de libros en '" + idioma + "': " + total);
-//
-//        libroRepository.buscarLibrosPorIdioma(idioma)
-//                .stream()
-//                .map(LibroEntity::getTitulo)
-//                .forEach(t -> System.out.println(" - " + t));
+    private void top10MasDescargados() {
+        List<LibroEntity> top10 = libroRepository.findTop10ByOrderByDescargasDesc();
 
+        if (top10.isEmpty()) {
+            System.out.println("No hay libros registrados en la base de datos.");
+            return;
+        }
+
+        System.out.println("Top 10 mas descargados");
+        for (LibroEntity libro : top10) {
+            System.out.println("------LIBRO------");
+            System.out.println("Título: " + libro.getTitulo());
+            System.out.println("Autor(es): " + (libro.getAutores() == null ? List.of() :
+                    libro.getAutores().stream().map(AutorEntity::getNombre).toList()));
+            System.out.println("Idioma: " + libro.getIdioma());
+            System.out.println("Descargas: " + libro.getDescargas());
+            System.out.println("------------------------");
+        }
     }
 }

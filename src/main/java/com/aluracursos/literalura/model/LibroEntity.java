@@ -3,7 +3,7 @@ package com.aluracursos.literalura.model;
 import jakarta.persistence.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Entity
 @Table(name = "libros")
@@ -36,18 +36,6 @@ public class LibroEntity {
                 this.autores = autores;
         }
 
-//        @Override
-//        public String toString() {
-//                String autoresStr = autores.stream()
-//                        .map(AutorEntity::getNombre)
-//                        .collect(Collectors.joining(", "));
-//                String idiomasStr = String.join(", ", idioma);
-//                return "---LIBRO---\n" +
-//                        "Titulo: " + titulo + "\n" +
-//                        "Autor(es): " + autoresStr + "\n" +
-//                        "Idioma(s): " + idiomasStr + "\n" +
-//                        "Numero de descargas: " + descargas + "\n";
-//        }
 
         // getters y setters
 

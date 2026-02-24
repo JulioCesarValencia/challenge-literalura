@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LibroRepository extends JpaRepository<LibroEntity, Long> {
+    List<LibroEntity> findTop10ByOrderByDescargasDesc();
     Optional<LibroEntity> findByTitulo(String titulo);
 
     @Query("SELECT COUNT(l) FROM LibroEntity l WHERE LOWER(l.idioma) = LOWER(:idioma)")
