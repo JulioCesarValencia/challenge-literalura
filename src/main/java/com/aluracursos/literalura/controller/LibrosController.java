@@ -61,7 +61,7 @@ public class LibrosController implements CommandLineRunner {
                 case 3 -> listarAutores();
                 case 4 -> listarAutoresVivosPorAnio();
                 case 5 -> listarLibrosPorIdioma();
-                case 0 -> System.out.println("Bye");
+                case 0 -> System.out.println("Gracias por tu visita!");
                 default -> System.out.println("Opcion invalida");
             }
         }
@@ -138,7 +138,27 @@ public class LibrosController implements CommandLineRunner {
             }
 
         System.out.println("Guardado(s) en la base de datos (si no existían). Mostrando resultados:");
-        datos.results().forEach(libro -> System.out.println(libro)); // usa toString() del record Libro
+        //datos.results().forEach(libro -> System.out.println(libro)); // usa toString() del record Libro
+
+        int count = 0;
+        for (Libro libro : datos.results()) {
+            if(count >= 4) break; // solo los primeros 4 libros
+
+            // Primer autor
+            Autor autor = libro.autores().isEmpty() ? null : libro.autores().get(0);
+            String nombreAutor = autor == null ? "Desconocido" : autor.nombre();
+
+            // Primer idioma
+            String idioma = libro.idiomas().isEmpty() ? "-" : libro.idiomas().get(0);
+
+            System.out.println("Título: " + libro.titulo());
+            System.out.println("Autor: " + nombreAutor);
+            System.out.println("Idioma: " + idioma);
+            System.out.println("Numero de Descargas: " + libro.descargas());
+            System.out.println("------------------------");
+
+            count++;
+        }
 
     }
 
@@ -168,8 +188,8 @@ public class LibrosController implements CommandLineRunner {
 
         for (AutorEntity a : autores) {
             System.out.println("Autor: " + a.getNombre());
-            System.out.println("Nacimiento: " + a.getFechaNacimiento());
-            System.out.println("Fallecimiento: " + a.getFechaFallecimiento());
+            System.out.println("Fecha de Nacimiento: " + a.getFechaNacimiento());
+            System.out.println("Fecha de Fallecimiento: " + a.getFechaFallecimiento());
             // títulos de los libros
             List<String> titulos = a.getLibros() == null ? List.of() :
                     a.getLibros().stream().map(LibroEntity::getTitulo).toList();
@@ -201,22 +221,57 @@ public class LibrosController implements CommandLineRunner {
             return;
         }
         System.out.println("Autores vivos en " + anio + ":");
-        vivos.forEach(a -> System.out.println(a.getNombre() + " (" + a.getFechaNacimiento() + " - " + a.getFechaFallecimiento() + ")"));
+        //vivos.forEach(a -> System.out.println(a.getNombre() + " (" + a.getFechaNacimiento() + " - " + a.getFechaFallecimiento() + ")"));
+
+
+        for (AutorEntity a : vivos) {
+            System.out.println("Autor: " + a.getNombre());
+            System.out.println("Fecha de Nacimiento: " + a.getFechaNacimiento());
+            System.out.println("Fecha de Fallecimiento: " + (a.getFechaFallecimiento() == null ? "Vivo" : a.getFechaFallecimiento()));
+            List<String> titulos = a.getLibros() == null ? List.of() :
+                    a.getLibros().stream().map(LibroEntity::getTitulo).toList();
+            System.out.println("Libros: " + titulos);
+            System.out.println("----------------------");
+        }
 
     }
 
     private void listarLibrosPorIdioma() {
-        System.out.println("Ingresa el idioma (es, en, fr, pt):");
+        System.out.println("Ingresa el idioma: ");
+        System.out.println("es - Español");
+        System.out.println("en - Inglés");
+        System.out.println("fr - Francés");
+        System.out.println("pt - Portugués");
+
         String idioma = teclado.nextLine().toLowerCase();
 
-        long total = libroRepository.contarLibrosPorIdioma(idioma);
+        List<LibroEntity> libros = libroRepository.buscarLibrosPorIdioma(idioma);
+        if (libros.isEmpty()) {
+            System.out.println("No hay libros registrados en la base de datos para el idioma '" + idioma + "'.");
+            return;
+        }
 
-        System.out.println("Total de libros en '" + idioma + "': " + total);
+        System.out.println("Libros en idioma '" + idioma + "':");
 
-        libroRepository.buscarLibrosPorIdioma(idioma)
-                .stream()
-                .map(LibroEntity::getTitulo)
-                .forEach(t -> System.out.println(" - " + t));
+        for (LibroEntity le : libros) {
+            System.out.println("Título: " + le.getTitulo());
+            System.out.println("Autor(es): " + (le.getAutores() == null ? List.of() :
+                    le.getAutores().stream().map(AutorEntity::getNombre).toList()));
+            System.out.println("Idioma: " + le.getIdioma());
+            System.out.println("Descargas: " + le.getDescargas());
+            System.out.println("----------------------");
+        }
+
+
+//
+//        long total = libroRepository.contarLibrosPorIdioma(idioma);
+//
+//        System.out.println("Total de libros en '" + idioma + "': " + total);
+//
+//        libroRepository.buscarLibrosPorIdioma(idioma)
+//                .stream()
+//                .map(LibroEntity::getTitulo)
+//                .forEach(t -> System.out.println(" - " + t));
 
     }
 }

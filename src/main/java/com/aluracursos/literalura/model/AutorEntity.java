@@ -19,6 +19,7 @@ public class AutorEntity {
         @ManyToMany(mappedBy = "autores", fetch = FetchType.EAGER)
         private List<LibroEntity> libros;
 
+
         // getters y setters
 
         public Long getId() {
