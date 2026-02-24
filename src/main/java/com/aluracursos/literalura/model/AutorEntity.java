@@ -16,7 +16,7 @@ public class AutorEntity {
         private Integer fechaNacimiento;
         private Integer fechaFallecimiento;
 
-        @ManyToMany(mappedBy = "autores")
+        @ManyToMany(mappedBy = "autores", fetch = FetchType.EAGER)
         private List<LibroEntity> libros;
 
         // getters y setters

@@ -16,7 +16,7 @@ public class LibroEntity {
         private String idioma;
         private Integer descargas;
 
-        @ManyToMany
+        @ManyToMany(fetch = FetchType.EAGER)
         @JoinTable(
                 name = "libro_autor",
                 joinColumns = @JoinColumn(name = "libro_id"),
