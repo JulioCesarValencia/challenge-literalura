@@ -1,15 +1,15 @@
+
+<div align="center">
+  <img src="assets/images/logo.jpg" alt="LiterAlura Logo" width="300"/>
+</div>
+
 # Literalura — Cliente y persistencia de libros 📚
 
-██╗     ██╗████████╗███████╗██████╗  █████╗ ██╗     ██╗   ██╗██████╗  █████╗ 
-██║     ██║╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██║     ██║   ██║██╔══██╗██╔══██╗
-██║     ██║   ██║   █████╗  ██████╔╝███████║██║     ██║   ██║██████╔╝███████║
-██║     ██║   ██║   ██╔══╝  ██╔══██╗██╔══██║██║     ██║   ██║██╔══██╗██╔══██║
-███████╗██║   ██║   ███████╗██║  ██║██║  ██║███████╗╚██████╔╝██║  ██║██║  ██║
-╚══════╝╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+---
 
 ![Java](https://img.shields.io/badge/Java-17-blue)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-green)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow)
 
 Literalura es una aplicación de consola construida con **Spring Boot** que permite:
@@ -18,6 +18,16 @@ Literalura es una aplicación de consola construida con **Spring Boot** que perm
 - Guardar libros y autores en tu **base de datos PostgreSQL** local.  
 - Consultar y listar libros y autores en múltiples formas (por título, por idioma, autores vivos en un año, etc.)  
 - Mostrar toda la información en consola de forma clara y vertical.  
+
+---
+
+## 🎥 Demostración
+
+<div align="center">
+  <img src="assets/gif/dev.gif" alt="Demostración de Literalura" width="400"/>
+  <br>
+  <em>Breve recorrido por las opciones del menú.</em>
+</div>
 
 ---
 
@@ -109,7 +119,7 @@ Al iniciar la app se verá:
 ---
 
 ## ➡️ Formato de salida (vertical y clara)
-
+```
 Libros:
 Título: Don Quijote
 Autor: Miguel de Cervantes Saavedra
@@ -123,6 +133,7 @@ Nacimiento: 1797
 Fallecimiento: 1851
 Libros: [Frankenstein, ...]
 ------------------------
+```
 
 ---
 
